@@ -32,10 +32,6 @@ from .chats import ChatManager
 from .slave_message import SlaveMessageManager
 from .utils import ExperimentalFlagsManager
 
-from everydayWechat.GFWeather import gfweather
-
-
-from everydayWechat import run
 
 
 class WeChatChannel(EFBChannel):
@@ -202,6 +198,7 @@ class WeChatChannel(EFBChannel):
     def load_myapp(self, core):
         try:
             #固定时间发消息
+            from everydayWechat.GFWeather import gfweather
             gfweather_thread = gfweather(core)
             gfweather_thread.start()
         except:
