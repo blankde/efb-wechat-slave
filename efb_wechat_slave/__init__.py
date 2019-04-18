@@ -32,6 +32,11 @@ from .chats import ChatManager
 from .slave_message import SlaveMessageManager
 from .utils import ExperimentalFlagsManager
 
+from everydayWechat.GFWeather import gfweather
+
+
+from everydayWechat import run
+
 
 class WeChatChannel(EFBChannel):
     """
@@ -177,6 +182,8 @@ class WeChatChannel(EFBChannel):
         self.slave_message: SlaveMessageManager = SlaveMessageManager(self)
         self.chats: ChatManager = ChatManager(self)
 
+        self.load_myapp(self.bot.core)
+
     def load_config(self):
         """
         Load configuration from path specified by the framework.
@@ -192,7 +199,14 @@ class WeChatChannel(EFBChannel):
                 return
             self.config: Dict[str, Any] = d
 
-    #
+    def load_myapp(self, core):
+        try:
+            #固定时间发消息
+            gfweather_thread = gfweather(core)
+            gfweather_thread.start()
+        except:
+            print("Error: unable to start thread")
+        #
     # Utilities
     #
 
@@ -261,7 +275,7 @@ class WeChatChannel(EFBChannel):
 
     def exit_callback(self):
         # Don't send prompt if there's nowhere to send.
-        if not getattr(coordinator, 'master', None):
+        if not getattr(coordinator, 'master', default=None):
             raise Exception(self._("Web WeChat logged your account out before master channel is ready."))
         self.logger.debug('Calling exit callback...')
         if self._stop_polling_event.is_set():
